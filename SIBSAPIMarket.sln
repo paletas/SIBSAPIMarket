@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.28621.142
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SIBSAPIMarket.Client", "SIBSAPIMarket.Client\SIBSAPIMarket.Client.csproj", "{B50CB853-6E2B-432C-9874-02CAB1EE888E}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SIBSAPIMarket.Client.Tests", "SIBSAPIMarket.Client.Tests\SIBSAPIMarket.Client.Tests.csproj", "{3FDAD79F-B073-47A4-8AEB-492D21803C6B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B50CB853-6E2B-432C-9874-02CAB1EE888E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B50CB853-6E2B-432C-9874-02CAB1EE888E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B50CB853-6E2B-432C-9874-02CAB1EE888E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B50CB853-6E2B-432C-9874-02CAB1EE888E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3FDAD79F-B073-47A4-8AEB-492D21803C6B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3FDAD79F-B073-47A4-8AEB-492D21803C6B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3FDAD79F-B073-47A4-8AEB-492D21803C6B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3FDAD79F-B073-47A4-8AEB-492D21803C6B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {3A2D6B37-343B-49C2-9302-162692A6555A}
+	EndGlobalSection
+EndGlobal
