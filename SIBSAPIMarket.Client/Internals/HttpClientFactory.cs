@@ -4,7 +4,7 @@ using System.Net.Http;
 
 namespace SIBSAPIMarket.Client.Internals
 {
-    internal class HttpClientFactory
+    internal class HttpClientFactory : IDisposable
     {
         private readonly string _clientID;
         private readonly ConcurrentQueue<HttpClient> _availableClients;
@@ -13,6 +13,15 @@ namespace SIBSAPIMarket.Client.Internals
         {
             this._clientID = clientID;
             this._availableClients = new ConcurrentQueue<HttpClient>();
+        }
+
+        public void Dispose()
+        {
+            HttpClient availableClient;
+            while(_availableClients.TryDequeue(out availableClient))
+            {
+                availableClient.Dispose();
+            }
         }
 
         public HttpClient Get()
@@ -26,6 +35,8 @@ namespace SIBSAPIMarket.Client.Internals
 
             EnsureHeader(httpClient, "TPP-Transaction-ID", Guid.NewGuid().ToString());
             EnsureHeader(httpClient, "TPP-Request-ID", Guid.NewGuid().ToString());
+            EnsureHeader(httpClient, "TPP-Certificate", Guid.NewGuid().ToString());
+            EnsureHeader(httpClient, "Signature", Guid.NewGuid().ToString());
             return httpClient;
         }
 
