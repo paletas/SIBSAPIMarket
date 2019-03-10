@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace SIBSAPIMarket.Client.Model.Responses
+namespace SIBSAPIMarket.Client.Model.API.Responses
 {
     public class ASPSPListResponse
     {

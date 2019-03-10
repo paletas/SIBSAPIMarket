@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SIBSAPIMarket.Client.Model
+namespace SIBSAPIMarket.Client.Model.API
 {
     public class ASPSP
     {

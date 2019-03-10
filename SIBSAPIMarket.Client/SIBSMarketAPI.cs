@@ -12,11 +12,15 @@ namespace SIBSAPIMarket.Client
 
         public SIBSMarketAPI(Uri apiPath, string clientID)
         {
+            BasePath = apiPath;
+
             HttpClientFactory = new HttpClientFactory(clientID);
             var endpoints = new Endpoints(apiPath);
 
             InformationProduct = new InformationProductAPI(endpoints, HttpClientFactory);
         }
+
+        public Uri BasePath { get; private set; }
 
         internal HttpClientFactory HttpClientFactory { get; private set; }
 

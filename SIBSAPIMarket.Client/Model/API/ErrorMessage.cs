@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace SIBSAPIMarket.Client.Model
+﻿namespace SIBSAPIMarket.Client.Model.API
 {
     public class ErrorMessage
     {

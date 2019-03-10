@@ -1,8 +1,6 @@
 ﻿using SIBSAPIMarket.Client.Configuration;
 using SIBSAPIMarket.Client.Internals;
-using SIBSAPIMarket.Client.Model.Responses;
-using System;
-using System.Net.Http;
+using SIBSAPIMarket.Client.Model.API.Responses;
 using System.Threading.Tasks;
 
 namespace SIBSAPIMarket.Client
