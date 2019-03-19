@@ -1,5 +1,6 @@
 ﻿using SIBSAPIMarket.Client.Configuration;
 using SIBSAPIMarket.Client.Internals;
+using SIBSAPIMarket.Client.Model;
 using System;
 
 namespace SIBSAPIMarket.Client
@@ -15,16 +16,26 @@ namespace SIBSAPIMarket.Client
             BasePath = apiPath;
 
             HttpClientFactory = new HttpClientFactory(clientID);
-            var endpoints = new Endpoints(apiPath);
+            Endpoints = new Endpoints(apiPath);
 
-            InformationProduct = new InformationProductAPI(endpoints, HttpClientFactory);
+            InformationProduct = new InformationProductAPI(Endpoints, HttpClientFactory);
         }
+
+        public SIBSMarketAPI(Uri apiPath, string clientID, ConsentRequiredHandler consentRequired)
+            : this(apiPath, clientID)
+        {
+            AccountInformation = new AccountInformationAPI(consentRequired, Endpoints, HttpClientFactory);
+        }
+
+        internal Endpoints Endpoints { get; private set; }
+        
+        internal HttpClientFactory HttpClientFactory { get; private set; }
 
         public Uri BasePath { get; private set; }
 
-        internal HttpClientFactory HttpClientFactory { get; private set; }
-
         public InformationProductAPI InformationProduct { get; private set; }
+
+        public AccountInformationAPI AccountInformation { get; private set; }
 
         public void Dispose()
         {

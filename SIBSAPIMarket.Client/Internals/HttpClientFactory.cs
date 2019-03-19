@@ -37,6 +37,9 @@ namespace SIBSAPIMarket.Client.Internals
             EnsureHeader(httpClient, "TPP-Request-ID", Guid.NewGuid().ToString());
             EnsureHeader(httpClient, "TPP-Certificate", Guid.NewGuid().ToString());
             EnsureHeader(httpClient, "Signature", Guid.NewGuid().ToString());
+
+            httpClient.DefaultRequestHeaders.Accept.TryParseAdd("application/json");
+
             return httpClient;
         }
 

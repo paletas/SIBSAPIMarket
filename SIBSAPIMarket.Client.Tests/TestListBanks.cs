@@ -1,15 +1,18 @@
 using System;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace SIBSAPIMarket.Client.Tests
 {
     public class TestListBanks : IDisposable
     {
+        private ITestOutputHelper _output;
         private SIBSMarketAPI _marketAPI;
 
-        public TestListBanks()
+        public TestListBanks(ITestOutputHelper output)
         {
-            _marketAPI = new SIBSMarketAPI(Configuration.DevelopmentPath, "9034a3c4-243e-430a-97e5-5f302f114306");
+            _output = output;
+            _marketAPI = new SIBSMarketAPI(Configuration.DevelopmentPath, Configuration.DeveloperAccountKey);
         }
 
         [Fact]
@@ -19,6 +22,11 @@ namespace SIBSAPIMarket.Client.Tests
 
             Assert.NotNull(response);
             Assert.NotEmpty(response.Banks);
+
+            foreach (var bank in response.Banks)
+            {
+                _output.WriteLine($"Available Bank » {bank.BankCode} - {bank.Name}");
+            }
         }
 
 

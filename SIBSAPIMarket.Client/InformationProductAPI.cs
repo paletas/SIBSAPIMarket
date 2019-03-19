@@ -17,7 +17,7 @@ namespace SIBSAPIMarket.Client
 
         public async Task<ASPSPListResponse> ListBanks()
         {
-            return await base.GetAsync<ASPSPListResponse>(_endpoints.BankListV1);
+            return await base.GetAsync<ASPSPListResponse>(_endpoints.BankList());
         }
     }
 }

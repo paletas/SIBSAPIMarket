@@ -3,8 +3,10 @@ using SIBSAPIMarket.Client.Model;
 using SIBSAPIMarket.Client.Model.API;
 using SIBSAPIMarket.Client.Model.API.Requests;
 using SIBSAPIMarket.Client.Model.API.Responses;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace SIBSAPIMarket.Client.Internals
@@ -27,68 +29,84 @@ namespace SIBSAPIMarket.Client.Internals
             ConsentID = consentID;
         }
 
-        protected override Task<T> GetAsync<T>(string requestUri)
+        protected Task<T> GetAsync<T>(string bankCode, Uri requestUri)
+        {
+            return GetAsync<T>(bankCode, requestUri.AbsoluteUri);
+        }
+
+        protected async Task<T> GetAsync<T>(string bankCode, string requestUri)
         {
             if (this.ConsentID == null)
             {
-                //await ObtainConsentFromPSUAsync();
+                await ObtainConsentFromPSUAsync(bankCode);
             }
 
-            return base.GetAsync<T>(requestUri);
+            return await base.GetAsync<T>(requestUri);
         }
 
-        protected override Task<TRP> PostAsync<TRQ, TRP>(string requestUri, TRQ requestContents = null)
+        protected override Task<TRP> PostAsync<TRQ, TRP>(string requestUri, TRQ requestContents = null, IDictionary<string, object> headers = null)
         {
-            return base.PostAsync<TRQ, TRP>(requestUri, requestContents);
+            return base.PostAsync<TRQ, TRP>(requestUri, requestContents, headers);
         }
         
         private async Task ObtainConsentFromPSUAsync(string bankCode)
         {
-            ConsentRequest consentRequest = await GetConsentDetails(bankCode);
+            var consentDetails = await this._consentRequiredHandler(bankCode);
+            var consentRequest = GetConsentDetails(consentDetails);
 
-            var response = base.PostAsync<ConsentRequest, ConsentResponse>(this._endpoints.CreateConsentV1, consentRequest);
+            var requestHeaders = new Dictionary<string, object>();
+            if (consentDetails.RedirectUri != null) requestHeaders.Add("TPP-Redirect-URI", consentDetails.RedirectUri.AbsoluteUri);
+
+            var response = await base.PostAsync<ConsentRequest, ConsentResponse>(this._endpoints.CreateConsent(bankCode, consentDetails.RedirectUri != null), consentRequest, requestHeaders);
         }
 
-        private async Task<ConsentRequest> GetConsentDetails(string bankCode)
+        private ConsentRequest GetConsentDetails(ConsentDetails consentDetails)
         {
-            var consentDetails = await this._consentRequiredHandler(bankCode);
-
             IList<AccountReference> accountDetails = new List<AccountReference>(), accountBalances = new List<AccountReference>(), accountTransactions = new List<AccountReference>();
 
-            foreach (var iban in consentDetails.IBAN)
+            if (consentDetails.IBAN != null)
             {
-                if ((iban.Purpose & ConsentDetails.AccountReference.PurposeEnum.AccountDetails) != 0)
-                    accountDetails.Add(new AccountReference(iban.Reference));
+                foreach (var iban in consentDetails.IBAN)
+                {
+                    if ((iban.Purpose & ConsentDetails.AccountReference.PurposeEnum.AccountDetails) != 0)
+                        accountDetails.Add(new AccountReference(iban.Reference));
 
-                if ((iban.Purpose & ConsentDetails.AccountReference.PurposeEnum.AccountBalance) != 0)
-                    accountBalances.Add(new AccountReference(iban.Reference));
+                    if ((iban.Purpose & ConsentDetails.AccountReference.PurposeEnum.AccountBalance) != 0)
+                        accountBalances.Add(new AccountReference(iban.Reference));
 
-                if ((iban.Purpose & ConsentDetails.AccountReference.PurposeEnum.AccountTransactions) != 0)
-                    accountTransactions.Add(new AccountReference(iban.Reference));
+                    if ((iban.Purpose & ConsentDetails.AccountReference.PurposeEnum.AccountTransactions) != 0)
+                        accountTransactions.Add(new AccountReference(iban.Reference));
+                }
             }
 
-            foreach (var bban in consentDetails.BBAN)
+            if (consentDetails.BBAN != null)
             {
-                if ((bban.Purpose & ConsentDetails.AccountReference.PurposeEnum.AccountDetails) != 0)
-                    accountDetails.Add(new AccountReference() { BBAN = bban.Reference });
+                foreach (var bban in consentDetails.BBAN)
+                {
+                    if ((bban.Purpose & ConsentDetails.AccountReference.PurposeEnum.AccountDetails) != 0)
+                        accountDetails.Add(new AccountReference() { BBAN = bban.Reference });
 
-                if ((bban.Purpose & ConsentDetails.AccountReference.PurposeEnum.AccountBalance) != 0)
-                    accountBalances.Add(new AccountReference() { BBAN = bban.Reference });
+                    if ((bban.Purpose & ConsentDetails.AccountReference.PurposeEnum.AccountBalance) != 0)
+                        accountBalances.Add(new AccountReference() { BBAN = bban.Reference });
 
-                if ((bban.Purpose & ConsentDetails.AccountReference.PurposeEnum.AccountTransactions) != 0)
-                    accountTransactions.Add(new AccountReference() { BBAN = bban.Reference });
+                    if ((bban.Purpose & ConsentDetails.AccountReference.PurposeEnum.AccountTransactions) != 0)
+                        accountTransactions.Add(new AccountReference() { BBAN = bban.Reference });
+                }
             }
 
-            foreach (var msisdn in consentDetails.MSISDN)
+            if (consentDetails.MSISDN != null)
             {
-                if ((msisdn.Purpose & ConsentDetails.AccountReference.PurposeEnum.AccountDetails) != 0)
-                    accountDetails.Add(new AccountReference() { MSISDN = msisdn.Reference });
+                foreach (var msisdn in consentDetails.MSISDN)
+                {
+                    if ((msisdn.Purpose & ConsentDetails.AccountReference.PurposeEnum.AccountDetails) != 0)
+                        accountDetails.Add(new AccountReference() { MSISDN = msisdn.Reference });
 
-                if ((msisdn.Purpose & ConsentDetails.AccountReference.PurposeEnum.AccountBalance) != 0)
-                    accountBalances.Add(new AccountReference() { MSISDN = msisdn.Reference });
+                    if ((msisdn.Purpose & ConsentDetails.AccountReference.PurposeEnum.AccountBalance) != 0)
+                        accountBalances.Add(new AccountReference() { MSISDN = msisdn.Reference });
 
-                if ((msisdn.Purpose & ConsentDetails.AccountReference.PurposeEnum.AccountTransactions) != 0)
-                    accountTransactions.Add(new AccountReference() { MSISDN = msisdn.Reference });
+                    if ((msisdn.Purpose & ConsentDetails.AccountReference.PurposeEnum.AccountTransactions) != 0)
+                        accountTransactions.Add(new AccountReference() { MSISDN = msisdn.Reference });
+                }
             }
 
             AccountAccess accountAccess = new AccountAccess
@@ -98,10 +116,7 @@ namespace SIBSAPIMarket.Client.Internals
                 Transactions = accountTransactions
             };
 
-            return new ConsentRequest(accountAccess, consentDetails.Recurring, consentDetails.ValidUntil, consentDetails.AccessFrequency ?? 1, consentDetails.Combined ?? false);
+            return new ConsentRequest(accountAccess, consentDetails.Recurring, consentDetails.ValidUntil?.ToUniversalTime(), consentDetails.AccessFrequency ?? 1, consentDetails.Combined ?? false);
         }
     }
-
-    public delegate Task<ConsentDetails> ConsentRequiredHandler(string bankCode);
-
 }

@@ -21,13 +21,15 @@ namespace SIBSAPIMarket.Client.Model
             public PurposeEnum Purpose { get; set; }
         }
 
-        public ConsentDetails(bool recurring, DateTime? validUntil = null, int? accessFrequency = null, bool? combined = null)
+        public ConsentDetails(bool recurring, Uri redirectUri = null, DateTime? validUntil = null, int? accessFrequency = null, bool? combined = null)
         {
             this.Recurring = recurring;
             this.ValidUntil = validUntil;
             this.AccessFrequency = accessFrequency;
             this.Combined = combined;
         }
+
+        public Uri RedirectUri { get; set; }
 
         public IEnumerable<AccountReference> IBAN { get; set; }
 

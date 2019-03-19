@@ -26,7 +26,7 @@ namespace SIBSAPIMarket.Client.Model.API
         [Newtonsoft.Json.JsonConverter(typeof(AvailableAccountsEnumConverter))]
         private AvailableAccountsEnum? AvailableAccounts { get; set; }
 
-        [Newtonsoft.Json.JsonProperty(PropertyName = "allPSD2", Required = Newtonsoft.Json.Required.Default)]
+        [Newtonsoft.Json.JsonProperty(PropertyName = "allPsd2", Required = Newtonsoft.Json.Required.Default)]
         [Newtonsoft.Json.JsonConverter(typeof(AllPSD2EnumConverter))]
         private AllPSD2Enum? AllPSD2 { get; set; }
     }
