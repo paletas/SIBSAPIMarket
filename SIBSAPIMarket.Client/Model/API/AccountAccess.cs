@@ -7,27 +7,42 @@ namespace SIBSAPIMarket.Client.Model.API
 {
     public class AccountAccess
     {
-        public AccountAccess()
+        public AccountAccess(AvailableAccountsEnum availableAccounts)
         {
-            this.AvailableAccounts = AvailableAccountsEnum.All;
-            this.AllPSD2 = AllPSD2Enum.All;
+            AvailableAccounts = availableAccounts;
         }
 
-        [Newtonsoft.Json.JsonProperty(PropertyName = "accounts", Required = Newtonsoft.Json.Required.Default)]
-        public IEnumerable<AccountReference> Accounts { get; set; }
+        public AccountAccess(AllPSD2Enum availableAccounts)
+        {
+            AllPSD2 = availableAccounts;
+        }
 
-        [Newtonsoft.Json.JsonProperty(PropertyName = "balances", Required = Newtonsoft.Json.Required.Default)]
-        public IEnumerable<AccountReference> Balances { get; set; }
+        public AccountAccess(AvailableAccountsEnum availableAccounts, IEnumerable<AccountReference> accountDetails)
+        {
+            Accounts = accountDetails;
+        }
 
-        [Newtonsoft.Json.JsonProperty(PropertyName = "transactions", Required = Newtonsoft.Json.Required.Default)]
-        public IEnumerable<AccountReference> Transactions { get; set; }
+        public AccountAccess(AllPSD2Enum availableAccounts, IEnumerable<AccountReference> accountBalances = null, IEnumerable<AccountReference> accountTransactions = null)
+        {
+            Balances = accountBalances;
+            Transactions = accountTransactions;
+        }
 
-        [Newtonsoft.Json.JsonProperty(PropertyName = "availableAccounts", Required = Newtonsoft.Json.Required.Default)]
+        [Newtonsoft.Json.JsonProperty(PropertyName = "accounts", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public IEnumerable<AccountReference> Accounts { get; private set; }
+
+        [Newtonsoft.Json.JsonProperty(PropertyName = "balances", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public IEnumerable<AccountReference> Balances { get; private set; }
+
+        [Newtonsoft.Json.JsonProperty(PropertyName = "transactions", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public IEnumerable<AccountReference> Transactions { get; private set; }
+
+        [Newtonsoft.Json.JsonProperty(PropertyName = "availableAccounts", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [Newtonsoft.Json.JsonConverter(typeof(AvailableAccountsEnumConverter))]
-        private AvailableAccountsEnum? AvailableAccounts { get; set; }
+        public AvailableAccountsEnum? AvailableAccounts { get; private set; }
 
-        [Newtonsoft.Json.JsonProperty(PropertyName = "allPsd2", Required = Newtonsoft.Json.Required.Default)]
+        [Newtonsoft.Json.JsonProperty(PropertyName = "allPsd2", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [Newtonsoft.Json.JsonConverter(typeof(AllPSD2EnumConverter))]
-        private AllPSD2Enum? AllPSD2 { get; set; }
+        public AllPSD2Enum? AllPSD2 { get; private set; }
     }
 }

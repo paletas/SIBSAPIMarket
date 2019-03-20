@@ -1,4 +1,6 @@
-﻿namespace SIBSAPIMarket.Client.Model.API
+﻿using SIBSAPIMarket.Client.Internals.JsonNET;
+
+namespace SIBSAPIMarket.Client.Model.API
 {
     public class ErrorMessage
     {
@@ -25,6 +27,7 @@
         }
 
         [Newtonsoft.Json.JsonProperty(PropertyName = "tppMessages")]
+        [Newtonsoft.Json.JsonConverter(typeof(SingleOrArrayConverter<TppMessage>))]
         public TppMessage[] Messages { get; set; }
     }
 }

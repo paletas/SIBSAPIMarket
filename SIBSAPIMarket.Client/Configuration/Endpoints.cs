@@ -28,15 +28,12 @@ namespace SIBSAPIMarket.Client.Configuration
 
         public Uri ListAccounts(string bankCode, bool? withBalance = null, bool? psuInvolved = null)
         {
-            var uriBuilder = new UriBuilder(new Uri(_basePath, Relative_ListAccountsV1.Replace("{bank-cde}", bankCode)));
+            var uriBuilder = new UriBuilder(new Uri(_basePath, Relative_ListAccountsV1.Replace("{aspsp-cde}", bankCode)));
             if (withBalance != null) AppendQueryParameter(uriBuilder, nameof(withBalance), withBalance);
             if (psuInvolved != null) AppendQueryParameter(uriBuilder, nameof(psuInvolved), psuInvolved);
             return uriBuilder.Uri;
         }
-
-
-
-
+                     
         private static void AppendQueryParameter(UriBuilder uriBuilder, string parameterName, object parameterValue)
         {
             var parameter = $"{parameterName}={parameterValue}";

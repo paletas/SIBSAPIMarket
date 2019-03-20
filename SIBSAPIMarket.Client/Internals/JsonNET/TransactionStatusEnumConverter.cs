@@ -8,7 +8,7 @@ namespace SIBSAPIMarket.Client.Internals.JsonNET
     {
         public override TransactionStatusEnum ReadJson(JsonReader reader, Type objectType, TransactionStatusEnum existingValue, bool hasExistingValue, JsonSerializer serializer)
         {
-            string value = reader.ReadAsString();
+            string value = (string) reader.Value;
             switch (value)
             {
                 case "RCVD": return TransactionStatusEnum.Received;
@@ -23,7 +23,7 @@ namespace SIBSAPIMarket.Client.Internals.JsonNET
                 case "ACCC": return TransactionStatusEnum.AcceptedSettlementCompleted;
                 case "RJCT": return TransactionStatusEnum.Rejected;
                 case "CANC": return TransactionStatusEnum.Cancelled;
-                default: throw new InvalidOperationException();
+                default: throw new InvalidOperationException($"{value} was not recognized as a valid {nameof(TransactionStatusEnum)}");
             }
         }
 

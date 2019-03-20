@@ -1,4 +1,5 @@
 ﻿using SIBSAPIMarket.Client.Configuration;
+using SIBSAPIMarket.Client.Exceptions;
 using SIBSAPIMarket.Client.Model;
 using SIBSAPIMarket.Client.Model.API;
 using SIBSAPIMarket.Client.Model.API.Requests;
@@ -38,83 +39,82 @@ namespace SIBSAPIMarket.Client.Internals
         {
             if (this.ConsentID == null)
             {
-                await ObtainConsentFromPSUAsync(bankCode);
+                var consentID = await ObtainConsentFromPSUAsync(bankCode);
+                if (consentID == null)
+                    throw new SIBSAPIException(("Consent-ID", "Unable to obtain"));
+                this.ConsentID = consentID;
             }
 
-            return await base.GetAsync<T>(requestUri);
+            var headers = new Dictionary<string, object>()
+            {
+                {  "Consent-ID", this.ConsentID }
+            };
+            return await base.GetAsync<T>(requestUri, headers);
         }
 
         protected override Task<TRP> PostAsync<TRQ, TRP>(string requestUri, TRQ requestContents = null, IDictionary<string, object> headers = null)
         {
             return base.PostAsync<TRQ, TRP>(requestUri, requestContents, headers);
         }
-        
-        private async Task ObtainConsentFromPSUAsync(string bankCode)
+
+        private async Task<string> ObtainConsentFromPSUAsync(string bankCode)
         {
             var consentDetails = await this._consentRequiredHandler(bankCode);
-            var consentRequest = GetConsentDetails(consentDetails);
+            var consentRequest = GetConsentDetailsForEverything(consentDetails);
 
             var requestHeaders = new Dictionary<string, object>();
             if (consentDetails.RedirectUri != null) requestHeaders.Add("TPP-Redirect-URI", consentDetails.RedirectUri.AbsoluteUri);
 
             var response = await base.PostAsync<ConsentRequest, ConsentResponse>(this._endpoints.CreateConsent(bankCode, consentDetails.RedirectUri != null), consentRequest, requestHeaders);
+
+            if (response.TransactionStatus == TransactionStatusEnum.Pending)
+                return response.ConsentID;
+
+            consentRequest = GetConsentDetailsForUserSelected(consentDetails);
+            response = await base.PostAsync<ConsentRequest, ConsentResponse>(this._endpoints.CreateConsent(bankCode, consentDetails.RedirectUri != null), consentRequest, requestHeaders);
+
+            if (response.TransactionStatus == TransactionStatusEnum.Pending)
+                return response.ConsentID;
+            else
+                return null;
         }
 
-        private ConsentRequest GetConsentDetails(ConsentDetails consentDetails)
+        private ConsentRequest GetConsentDetailsForEverything(ConsentDetails consentDetails)
         {
-            IList<AccountReference> accountDetails = new List<AccountReference>(), accountBalances = new List<AccountReference>(), accountTransactions = new List<AccountReference>();
-
-            if (consentDetails.IBAN != null)
+            AccountAccess accountAccess;
+            if (consentDetails.ConsentPurpose == ConsentDetails.PurposeEnum.AccountDetails)
             {
-                foreach (var iban in consentDetails.IBAN)
-                {
-                    if ((iban.Purpose & ConsentDetails.AccountReference.PurposeEnum.AccountDetails) != 0)
-                        accountDetails.Add(new AccountReference(iban.Reference));
-
-                    if ((iban.Purpose & ConsentDetails.AccountReference.PurposeEnum.AccountBalance) != 0)
-                        accountBalances.Add(new AccountReference(iban.Reference));
-
-                    if ((iban.Purpose & ConsentDetails.AccountReference.PurposeEnum.AccountTransactions) != 0)
-                        accountTransactions.Add(new AccountReference(iban.Reference));
-                }
+                accountAccess = new AccountAccess(AvailableAccountsEnum.All);
+            }
+            else
+            {
+                accountAccess = new AccountAccess(AllPSD2Enum.All);
             }
 
-            if (consentDetails.BBAN != null)
+            return new ConsentRequest(accountAccess, consentDetails.Recurring, consentDetails.ValidUntil?.ToUniversalTime(), consentDetails.AccessFrequency ?? 1, consentDetails.Combined ?? false);
+        }
+
+        private ConsentRequest GetConsentDetailsForUserSelected(ConsentDetails consentDetails)
+        {
+            AccountAccess accountAccess;
+            if (consentDetails.ConsentPurpose == ConsentDetails.PurposeEnum.AccountDetails)
             {
-                foreach (var bban in consentDetails.BBAN)
-                {
-                    if ((bban.Purpose & ConsentDetails.AccountReference.PurposeEnum.AccountDetails) != 0)
-                        accountDetails.Add(new AccountReference() { BBAN = bban.Reference });
-
-                    if ((bban.Purpose & ConsentDetails.AccountReference.PurposeEnum.AccountBalance) != 0)
-                        accountBalances.Add(new AccountReference() { BBAN = bban.Reference });
-
-                    if ((bban.Purpose & ConsentDetails.AccountReference.PurposeEnum.AccountTransactions) != 0)
-                        accountTransactions.Add(new AccountReference() { BBAN = bban.Reference });
-                }
+                accountAccess = new AccountAccess(
+                    AvailableAccountsEnum.All
+                    , consentDetails.GetAccountReferencesFor(ConsentDetails.PurposeEnum.AccountDetails)
+                        .Select(@ref => new AccountReference(@ref.IBAN) { BBAN = @ref.BBAN, MSISDN = @ref.MSISDN })
+                );
             }
-
-            if (consentDetails.MSISDN != null)
+            else
             {
-                foreach (var msisdn in consentDetails.MSISDN)
-                {
-                    if ((msisdn.Purpose & ConsentDetails.AccountReference.PurposeEnum.AccountDetails) != 0)
-                        accountDetails.Add(new AccountReference() { MSISDN = msisdn.Reference });
-
-                    if ((msisdn.Purpose & ConsentDetails.AccountReference.PurposeEnum.AccountBalance) != 0)
-                        accountBalances.Add(new AccountReference() { MSISDN = msisdn.Reference });
-
-                    if ((msisdn.Purpose & ConsentDetails.AccountReference.PurposeEnum.AccountTransactions) != 0)
-                        accountTransactions.Add(new AccountReference() { MSISDN = msisdn.Reference });
-                }
+                accountAccess = new AccountAccess(
+                    AllPSD2Enum.All
+                    , consentDetails.GetAccountReferencesFor(ConsentDetails.PurposeEnum.AccountBalances)
+                        .Select(@ref => new AccountReference(@ref.IBAN) { BBAN = @ref.BBAN, MSISDN = @ref.MSISDN })
+                    , consentDetails.GetAccountReferencesFor(ConsentDetails.PurposeEnum.AccountTransactions)
+                        .Select(@ref => new AccountReference(@ref.IBAN) { BBAN = @ref.BBAN, MSISDN = @ref.MSISDN })
+                );
             }
-
-            AccountAccess accountAccess = new AccountAccess
-            {
-                Accounts = accountDetails,
-                Balances = accountBalances,
-                Transactions = accountTransactions
-            };
 
             return new ConsentRequest(accountAccess, consentDetails.Recurring, consentDetails.ValidUntil?.ToUniversalTime(), consentDetails.AccessFrequency ?? 1, consentDetails.Combined ?? false);
         }

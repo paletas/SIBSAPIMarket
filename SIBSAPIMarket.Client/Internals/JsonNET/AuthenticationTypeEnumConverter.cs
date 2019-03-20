@@ -8,7 +8,7 @@ namespace SIBSAPIMarket.Client.Internals.JsonNET
     {
         public override AuthenticationTypeEnum ReadJson(JsonReader reader, Type objectType, AuthenticationTypeEnum existingValue, bool hasExistingValue, JsonSerializer serializer)
         {
-            string value = reader.ReadAsString();
+            string value = (string)reader.Value;
             switch (value)
             {
                 case "SMS_OTP": return AuthenticationTypeEnum.SMS;

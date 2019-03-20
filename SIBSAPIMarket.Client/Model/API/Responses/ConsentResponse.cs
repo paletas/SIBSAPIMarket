@@ -1,10 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using SIBSAPIMarket.Client.Internals.JsonNET;
+using System.Collections.Generic;
 
 namespace SIBSAPIMarket.Client.Model.API.Responses
 {
     public class ConsentResponse
     {
         [Newtonsoft.Json.JsonProperty(PropertyName = "transactionStatus", Required = Newtonsoft.Json.Required.Always)]
+        [Newtonsoft.Json.JsonConverter(typeof(TransactionStatusEnumConverter))]
         public TransactionStatusEnum TransactionStatus { get; set; }
 
         [Newtonsoft.Json.JsonProperty(PropertyName = "consentId", Required = Newtonsoft.Json.Required.Default)]
@@ -19,7 +21,7 @@ namespace SIBSAPIMarket.Client.Model.API.Responses
         [Newtonsoft.Json.JsonProperty(PropertyName = "challengeData", Required = Newtonsoft.Json.Required.Default)]
         public Challenge ChallengeData { get; set; }
 
-        [Newtonsoft.Json.JsonProperty(PropertyName = "_Links", Required = Newtonsoft.Json.Required.Always)]
+        [Newtonsoft.Json.JsonProperty(PropertyName = "_links", Required = Newtonsoft.Json.Required.Always)]
         public ConsentLinks Links { get; set; }
 
         [Newtonsoft.Json.JsonProperty(PropertyName = "psuMessage", Required = Newtonsoft.Json.Required.Default)]

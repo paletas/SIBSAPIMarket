@@ -20,16 +20,26 @@ namespace SIBSAPIMarket.Client.Internals
             this._clientFactory = clientFactory;
         }
 
-        protected Task<T> GetAsync<T>(Uri requestUri)
+        protected Task<T> GetAsync<T>(Uri requestUri, IDictionary<string, object> headers = null)
         {
-            return GetAsync<T>(requestUri.AbsoluteUri);
+            return GetAsync<T>(requestUri.AbsoluteUri, headers);
         }
 
-        protected virtual async Task<T> GetAsync<T>(string requestUri)
+        protected virtual async Task<T> GetAsync<T>(string requestUri, IDictionary<string, object> headers = null)
         {
             var httpClient = this._clientFactory.Get();
 
-            var responseMessage = await httpClient.GetAsync(requestUri);
+            var request = new HttpRequestMessage(HttpMethod.Get, requestUri);
+
+            if (headers != null)
+            {
+                foreach (var keyPair in headers)
+                {
+                    request.Headers.Add(keyPair.Key, keyPair.Value.ToString());
+                }
+            }
+
+            var responseMessage = await httpClient.SendAsync(request);
             var responseString = await responseMessage.Content.ReadAsStringAsync();
 
             if (responseMessage.IsSuccessStatusCode)

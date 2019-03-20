@@ -25,7 +25,7 @@ namespace SIBSAPIMarket.Client.Tests
 
             foreach (var bank in response.Banks)
             {
-                _output.WriteLine($"Available Bank » {bank.BankCode} - {bank.Name}");
+                _output.WriteLine($"Available Bank » {bank.Code} - {bank.BankCode} - {bank.Name}");
             }
         }
 

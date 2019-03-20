@@ -8,7 +8,7 @@ namespace SIBSAPIMarket.Client.Internals.JsonNET
     {
         public override AvailableAccountsEnum ReadJson(JsonReader reader, Type objectType, AvailableAccountsEnum existingValue, bool hasExistingValue, JsonSerializer serializer)
         {
-            string value = reader.ReadAsString();
+            string value = (string)reader.Value;
             switch (value)
             {
                 case "all-accounts": return AvailableAccountsEnum.All;
