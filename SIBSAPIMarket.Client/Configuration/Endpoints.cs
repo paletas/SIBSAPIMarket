@@ -33,12 +33,21 @@ namespace SIBSAPIMarket.Client.Configuration
             if (psuInvolved != null) AppendQueryParameter(uriBuilder, nameof(psuInvolved), psuInvolved);
             return uriBuilder.Uri;
         }
-                     
+        
+        private static string Relative_AccountDetailssV1 { get; } = "{aspsp-cde}/v1/accounts/{account-id}";
+
+        public Uri AccountDetails(string bankCode, string accountID, bool? withBalance = null, bool? psuInvolved = null)
+        {
+            var uriBuilder = new UriBuilder(new Uri(_basePath, Relative_AccountDetailssV1.Replace("{aspsp-cde}", bankCode).Replace("{account-id}", accountID)));
+            if (withBalance != null) AppendQueryParameter(uriBuilder, nameof(withBalance), withBalance);
+            if (psuInvolved != null) AppendQueryParameter(uriBuilder, nameof(psuInvolved), psuInvolved);
+            return uriBuilder.Uri;
+        }
         private static void AppendQueryParameter(UriBuilder uriBuilder, string parameterName, object parameterValue)
         {
             var parameter = $"{parameterName}={parameterValue}";
             if (string.IsNullOrEmpty(uriBuilder.Query) == false)
-                uriBuilder.Query += parameter;
+                uriBuilder.Query += "&" + parameter;
             else
                 uriBuilder.Query = parameter;
         }
