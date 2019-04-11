@@ -34,15 +34,35 @@ namespace SIBSAPIMarket.Client.Configuration
             return uriBuilder.Uri;
         }
         
-        private static string Relative_AccountDetailssV1 { get; } = "{aspsp-cde}/v1/accounts/{account-id}";
+        private static string Relative_AccountDetailsV1 { get; } = "{aspsp-cde}/v1/accounts/{account-id}";
 
         public Uri AccountDetails(string bankCode, string accountID, bool? withBalance = null, bool? psuInvolved = null)
         {
-            var uriBuilder = new UriBuilder(new Uri(_basePath, Relative_AccountDetailssV1.Replace("{aspsp-cde}", bankCode).Replace("{account-id}", accountID)));
+            var uriBuilder = new UriBuilder(new Uri(_basePath, Relative_AccountDetailsV1.Replace("{aspsp-cde}", bankCode).Replace("{account-id}", accountID)));
             if (withBalance != null) AppendQueryParameter(uriBuilder, nameof(withBalance), withBalance);
             if (psuInvolved != null) AppendQueryParameter(uriBuilder, nameof(psuInvolved), psuInvolved);
             return uriBuilder.Uri;
         }
+        
+        private static string Relative_AccountBalancesV1 { get; } = "{aspsp-cde}/v1/accounts/{account-id}/balances";
+
+        public Uri AccountBalances(string bankCode, string accountID, bool? psuInvolved = null)
+        {
+            var uriBuilder = new UriBuilder(new Uri(_basePath, Relative_AccountBalancesV1.Replace("{aspsp-cde}", bankCode).Replace("{account-id}", accountID)));
+            if (psuInvolved != null) AppendQueryParameter(uriBuilder, nameof(psuInvolved), psuInvolved);
+            return uriBuilder.Uri;
+        }
+
+        private static string Relative_AccountTransactionsV1 { get; } = "{aspsp-cde}/v1/accounts/{account-id}/transactions";
+
+        public Uri AccountTransactions(string bankCode, string accountID, bool? psuInvolved = null)
+        {
+            var uriBuilder = new UriBuilder(new Uri(_basePath, Relative_AccountTransactionsV1.Replace("{aspsp-cde}", bankCode).Replace("{account-id}", accountID)));
+            if (psuInvolved != null) AppendQueryParameter(uriBuilder, nameof(psuInvolved), psuInvolved);
+            return uriBuilder.Uri;
+        }
+
+
         private static void AppendQueryParameter(UriBuilder uriBuilder, string parameterName, object parameterValue)
         {
             var parameter = $"{parameterName}={parameterValue}";

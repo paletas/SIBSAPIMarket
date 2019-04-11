@@ -1,6 +1,6 @@
 ﻿namespace SIBSAPIMarket.Client.Model.API.Responses
 {
-    public class AccountDetailResponse
+    public class AccountDetailsResponse
     {
         [Newtonsoft.Json.JsonProperty("account")]
         public AccountDetails Account { get; set; }

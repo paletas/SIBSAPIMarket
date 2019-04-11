@@ -23,9 +23,19 @@ namespace SIBSAPIMarket.Client
             return await GetAsync<AccountsResponse>(aspspCde, _endpoints.ListAccounts(aspspCde, withBalances, psuAsked));
         }
 
-        public async Task<AccountDetailResponse> GetAccountDetails(string aspspCde, string accountID, bool withBalances = false, bool psuAsked = false)
+        public async Task<AccountDetailsResponse> GetAccountDetails(string aspspCde, string accountID, bool withBalances = false, bool psuAsked = false)
         {
-            return await GetAsync<AccountDetailResponse>(aspspCde, _endpoints.AccountDetails(aspspCde, accountID));
+            return await GetAsync<AccountDetailsResponse>(aspspCde, _endpoints.AccountDetails(aspspCde, accountID, withBalances, psuAsked));
+        }
+
+        public async Task<AccountBalancesResponse> GetAccountBalances(string aspspCde, string accountID, bool psuAsked = false)
+        {
+            return await GetAsync<AccountBalancesResponse>(aspspCde, _endpoints.AccountBalances(aspspCde, accountID, psuAsked));
+        }
+
+        public async Task<AccountTransactionsResponse> GetAccountTransactions(string aspspCde, string accountID, bool psuAsked = false)
+        {
+            return await GetAsync<AccountTransactionsResponse>(aspspCde, _endpoints.AccountTransactions(aspspCde, accountID, psuAsked));
         }
     }
 }

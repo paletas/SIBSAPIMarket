@@ -7,5 +7,10 @@
 
         [Newtonsoft.Json.JsonProperty(PropertyName = "currency", Required = Newtonsoft.Json.Required.Always)]
         public string Currency { get; set; }
+
+        public override string ToString()
+        {
+            return $"{Value}[{Currency}]";
+        }
     }
 }

@@ -4,12 +4,12 @@ using Xunit.Abstractions;
 
 namespace SIBSAPIMarket.Client.Tests
 {
-    public class TestListBanks : IDisposable
+    public class InformationProductTest : IDisposable
     {
         private ITestOutputHelper _output;
         private SIBSMarketAPI _marketAPI;
 
-        public TestListBanks(ITestOutputHelper output)
+        public InformationProductTest(ITestOutputHelper output)
         {
             _output = output;
             _marketAPI = new SIBSMarketAPI(Configuration.DevelopmentPath, Configuration.DeveloperAccountKey);
@@ -28,8 +28,7 @@ namespace SIBSAPIMarket.Client.Tests
                 _output.WriteLine($"Available Bank » {bank.Code} - {bank.BankCode} - {bank.Name}");
             }
         }
-
-
+        
         [Fact]
         public async void CanListTwiceWithSameClient()
         {
